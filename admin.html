@@ -10,18 +10,16 @@
 </head>
 <body class="bg-gray-100">
 
-  <div id="app-container" class="relative min-h-screen">
-    <!-- Header -->
+  <div id="app-container" class="relative min-h-screen flex flex-col">
     <header class="bg-white shadow-md sticky top-0 z-20">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <a href="index.html" class="text-xl font-bold text-gray-800">EveKuru for Organizers</a>
-            <button id="menu-button" class="z-40 p-2 -mr-2">
+            <button id="menu-button" class="z-40 p-2 -mr-2 text-gray-600">
                 <i class="fas fa-bars fa-lg"></i>
             </button>
         </div>
     </header>
 
-    <!-- Slide-out Menu -->
     <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
     <nav id="menu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-40 p-6 transform translate-x-full">
         <ul class="space-y-2">
@@ -33,10 +31,9 @@
         <ul class="space-y-2">
             <li><a href="https://qcda-dev.github.io/HP/" target="_blank" class="menu-link">QcDa Projectとは</a></li>
         </ul>
-        <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.0.0</p>
+        <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.1.0</p>
     </nav>
 
-    <!-- Main Content -->
     <main class="w-full max-w-md mx-auto p-4 flex-grow flex flex-col justify-center">
         <div id="adminScreen" class="bg-white rounded-xl shadow-lg p-6 sm:p-8 space-y-4">
             <h1 class="text-2xl font-bold text-gray-800 text-center">管理者画面</h1>
@@ -47,46 +44,27 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="text-center py-4">
         <p class="text-xs text-gray-500">© 2025 QcDa Project. All Rights Reserved.</p>
     </footer>
   </div>
 
-  <script>
-    // --- DOM Elements ---
-    const menuButton = document.getElementById('menu-button');
-    const menu = document.getElementById('menu');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const eventNameDisplay = document.getElementById('eventNameDisplay');
-    const logoutButton = document.getElementById('logoutButton');
+  <script type="module">
+    import { initMenu, authGuard } from './common.js';
 
-    // --- UI Functions ---
-    function toggleMenu() {
-      menu.classList.toggle('translate-x-full');
-      menuOverlay.classList.toggle('hidden');
-    }
-
-    // --- Auth Guard ---
     document.addEventListener('DOMContentLoaded', () => {
-      const sheetId = sessionStorage.getItem('sheetId');
-      if (!sheetId) {
-        // If not logged in, redirect to login page
-        window.location.href = 'index.html';
-        return;
+      initMenu();
+      const session = authGuard(); // Protect page
+      if(session){
+        document.getElementById('eventNameDisplay').textContent = session.eventName || 'イベント名未設定';
       }
-      const eventName = sessionStorage.getItem('eventName');
-      eventNameDisplay.textContent = eventName || 'イベント名未設定';
     });
 
-    // --- Event Listeners ---
-    menuButton.addEventListener('click', toggleMenu);
-    menuOverlay.addEventListener('click', toggleMenu);
-    logoutButton.addEventListener('click', () => {
+    document.getElementById('logoutButton').addEventListener('click', () => {
       sessionStorage.clear();
       window.location.href = 'index.html';
     });
-
   </script>
 </body>
 </html>
+
