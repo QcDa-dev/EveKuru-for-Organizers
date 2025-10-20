@@ -5,7 +5,7 @@
 // --- Configuration ---
 export const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyDfNZbhu3xOLjApPQ1a2anibwh-Ck6ZlaO88RcrVtcJX9-EAvdiWgCPvi-xlGfBi-XzQ/exec";
 export const GITHUB_USER = 'qcda-dev';
-export const GITHUB_REPO = 'EveKuru-for-Organizers'; // This app's repository name
+export const GITHUB_REPO = 'EveKuru-for-Organizers';
 
 /**
  * Renders the common header and menu into the placeholder.
@@ -26,18 +26,16 @@ function renderHeaderAndMenu(appName) {
       </header>
       <div id="menu-overlay" class="is-hidden"></div>
       <nav id="menu" class="is-closed">
-          <div class="p-2">
-              <ul class="space-y-2">
-                  <li><a href="guide.html" target="_blank" class="menu-link">使い方ガイド</a></li>
-                  <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSckrrhDeGQajywfDx9mnGqzDiT1fUPevqi32mAK1JjutlFSlw/viewform?usp=sharing" target="_blank" class="menu-link">お問い合わせ</a></li>
-                  <li><a href="release-notes.html" target="_blank" class="menu-link">リリースノート</a></li>
-              </ul>
-              <hr class="my-4 border-gray-200">
-              <ul class="space-y-2">
-                  <li><a href="https://qcda-dev.github.io/HP/" target="_blank" class="menu-link">QcDa Projectとは</a></li>
-              </ul>
-              <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.2.0</p>
-          </div>
+          <ul class="menu-list">
+              <li class="menu-list-item"><a href="guide.html" class="menu-link">使い方ガイド</a></li>
+              <li class="menu-list-item"><a href="https://docs.google.com/forms/d/e/1FAIpQLSckrrhDeGQajywfDx9mnGqzDiT1fUPevqi32mAK1JjutlFSlw/viewform?usp=sharing" target="_blank" class="menu-link">お問い合わせ</a></li>
+              <li class="menu-list-item"><a href="release-notes.html" class="menu-link">リリースノート</a></li>
+          </ul>
+          <hr class="my-4 border-gray-200">
+          <ul class="menu-list">
+              <li class="menu-list-item"><a href="https://qcda-dev.github.io/HP/" target="_blank" class="menu-link">QcDa Projectとは</a></li>
+          </ul>
+          <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.3.0</p>
       </nav>
     `;
 }
@@ -51,6 +49,7 @@ function initMenu() {
     const menuOverlay = document.getElementById('menu-overlay');
 
     const toggleMenu = () => {
+        if (!menu || !menuOverlay) return;
         const isClosed = menu.classList.toggle('is-closed');
         menuOverlay.classList.toggle('is-hidden', isClosed);
     };
@@ -77,12 +76,15 @@ export function hideLoader() {
  * @param {string} config.title - The page title.
  */
 export function initPage(config) {
-    renderHeaderAndMenu('EveKuru for Organizers');
-    document.title = `${config.title} - EveKuru for Organizers`;
-    initMenu();
-    if (config.auth === 'private') {
-        authGuard();
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        renderHeaderAndMenu('EveKuru for Organizers');
+        document.title = `${config.title} - EveKuru for Organizers`;
+        initMenu();
+        if (config.auth === 'private') {
+            authGuard();
+        }
+        hideLoader();
+    });
 }
 
 // --- Auth & API ---
@@ -104,9 +106,9 @@ export async function callGasApi(payload) {
     try {
         const response = await fetch(GAS_API_URL, {
             method: 'POST',
-            mode: 'cors', // Required for cross-origin requests
-            credentials: 'omit', // Default, but good to be explicit
-            headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, // GAS quirk
+            mode: 'cors',
+            credentials: 'omit',
+            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
             body: JSON.stringify(payload)
         });
         if (!response.ok) {
