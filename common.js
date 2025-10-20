@@ -35,7 +35,7 @@ function renderHeaderAndMenu(appName) {
           <ul class="menu-list">
               <li class="menu-list-item"><a href="https://qcda-dev.github.io/HP/" target="_blank" class="menu-link">QcDa Projectとは</a></li>
           </ul>
-          <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.3.0</p>
+          <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.4.0</p>
       </nav>
     `;
 }
@@ -68,6 +68,21 @@ export function hideLoader() {
     const loadingOverlay = document.getElementById('loadingOverlay');
     if (loadingOverlay) loadingOverlay.classList.add('hidden');
 }
+
+/**
+ * Displays a message in a designated message box.
+ * @param {string} elementId - The ID of the message box element.
+ * @param {string} message - The message to display.
+ * @param {'error' | 'success' | 'info'} type - The type of message.
+ */
+export function showMessage(elementId, message, type) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.textContent = message;
+    el.className = 'message-box'; // Reset classes
+    el.classList.add(`is-${type}`);
+}
+
 
 /**
  * Initializes a standard page with header, menu, and auth guard.
