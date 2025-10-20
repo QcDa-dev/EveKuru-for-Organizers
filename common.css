@@ -226,7 +226,6 @@ body {
 /* --- Guide & Release notes Specifics --- */
 .main-content.is-wide { max-width: 800px; }
 
-/* ★★★★★ Updated Guide Styles Start ★★★★★ */
 .guide-container {
     max-width: 700px;
     margin: 0 auto;
@@ -251,6 +250,7 @@ body {
     padding: 2rem;
     border-radius: 16px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    margin-bottom: 3rem;
 }
 
 .guide-section h3 {
@@ -283,7 +283,6 @@ body {
     font-size: 1rem;
     line-height: 1.8;
 }
-/* ★★★★★ Updated Guide Styles End ★★★★★ */
 
 
 .release-content h1, .release-content h2, .release-content h3 {
