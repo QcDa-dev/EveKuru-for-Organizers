@@ -3,99 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>リリースノート - EveKuru for Organizers</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        .release-content h1, .release-content h2, .release-content h3 { @apply text-xl font-bold mt-4 mb-2 border-b pb-1; }
-        .release-content ul { @apply list-disc list-inside ml-4; }
-        .release-content li { @apply mb-1; }
-        .release-content p { @apply mb-2; }
-        .release-content a { @apply text-blue-600 hover:underline; }
-    </style>
+    <link rel="stylesheet" href="common.css">
 </head>
-<body class="bg-gray-100">
+<body>
+  <div id="loadingOverlay" class="loader-overlay">
+    <div class="loader"></div>
+  </div>
 
-  <div id="app-container" class="relative min-h-screen">
-    <!-- Header -->
-    <header class="bg-white shadow-md sticky top-0 z-20">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="index.html" class="text-xl font-bold text-gray-800">EveKuru for Organizers</a>
-            <button id="menu-button" class="z-40 p-2 -mr-2">
-                <i class="fas fa-bars fa-lg"></i>
-            </button>
+  <div class="page-container">
+    <div id="header-placeholder"></div>
+
+    <main class="main-content" style="max-width: 800px;">
+        <h1 class="card-title" style="margin-bottom: 2rem;">リリースノート</h1>
+        <div id="release-notes-container" class="space-y-8">
+            <!-- Release notes will be loaded here -->
         </div>
-    </header>
-
-    <!-- Slide-out Menu -->
-    <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
-    <nav id="menu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-40 p-6 transform translate-x-full">
-        <ul class="space-y-2">
-            <li><a href="guide.html" target="_blank" class="menu-link">使い方ガイド</a></li>
-            <li><a href="https://forms.gle/your-contact-form" target="_blank" class="menu-link">お問い合わせ</a></li>
-            <li><a href="release-notes.html" target="_blank" class="menu-link">リリースノート</a></li>
-        </ul>
-        <hr class="my-4 border-gray-200">
-        <ul class="space-y-2">
-            <li><a href="https://qcda-dev.github.io/HP/" target="_blank" class="menu-link">QcDa Projectとは</a></li>
-        </ul>
-        <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.0.0</p>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-6 py-12">
-        <section>
-            <h1 class="text-3xl font-bold text-center mb-10">リリースノート</h1>
-            <div id="release-notes-container" class="max-w-3xl mx-auto space-y-8">
-                <!-- Release notes will be loaded here -->
-            </div>
-            <div id="loadingIndicator" class="text-center py-10">
-                <div class="loader mx-auto"></div>
-                <p class="mt-4 text-gray-600">読み込み中...</p>
-            </div>
-        </section>
+        <div id="loadingIndicator" class="text-center py-10">
+            <div class="loader mx-auto"></div>
+        </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="text-center py-4">
-        <p class="text-xs text-gray-500">© 2025 QcDa Project. All Rights Reserved.</p>
+    <footer class="app-footer">
+        © 2025 QcDa Project. All Rights Reserved.
     </footer>
   </div>
 
-  <script>
-    // --- DOM Elements ---
-    const menuButton = document.getElementById('menu-button');
-    const menu = document.getElementById('menu');
-    const menuOverlay = document.getElementById('menu-overlay');
+  <script type="module">
+    import { initPage, GITHUB_USER, GITHUB_REPO } from './common.js';
+    initPage({ auth: 'public', title: 'リリースノート' });
 
-    // --- UI Functions ---
-    function toggleMenu() {
-      menu.classList.toggle('translate-x-full');
-      menuOverlay.classList.toggle('hidden');
-    }
-
-    // --- Event Listeners ---
-    menuButton.addEventListener('click', toggleMenu);
-    menuOverlay.addEventListener('click', toggleMenu);
-    
-    // --- GitHub Release Notes Fetcher ---
     document.addEventListener('DOMContentLoaded', () => {
-        // ▼▼▼ 【重要】あなたのGitHubユーザー名と、このアプリのリポジトリ名に置き換えてください ▼▼▼
-        const GITHUB_USER = 'qcda-dev'; 
-        const GITHUB_REPO = 'EveKuru-for-Organizers'; // 例: このリポジトリ名を 'EveKuru-Organizers' とした場合
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-
         const container = document.getElementById('release-notes-container');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases`;
 
         fetch(apiUrl)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
                 return response.json();
             })
             .then(releases => {
@@ -104,13 +50,11 @@
                     container.innerHTML = '<p class="text-center text-gray-500">リリース情報はまだありません。</p>';
                     return;
                 }
-
                 releases.forEach(release => {
                     const releaseDate = new Date(release.published_at).toLocaleDateString('ja-JP');
                     const releaseElement = document.createElement('div');
-                    releaseElement.className = 'bg-white p-6 rounded-xl shadow-md';
+                    releaseElement.className = 'content-card';
                     const releaseBodyHtml = marked.parse(release.body);
-
                     releaseElement.innerHTML = `
                         <div class="flex justify-between items-center mb-3">
                             <h3 class="text-2xl font-bold text-gray-900">${release.name || release.tag_name}</h3>
@@ -124,9 +68,10 @@
             .catch(error => {
                 loadingIndicator.classList.add('hidden');
                 console.error('Error fetching release notes:', error);
-                container.innerHTML = '<p class="text-center text-red-500">リリース情報の取得に失敗しました。リポジトリが非公開になっていないか、またはユーザー名とリポジトリ名が正しいか確認してください。</p>';
+                container.innerHTML = '<p class="text-center text-red-500">リリース情報の取得に失敗しました。</p>';
             });
     });
   </script>
 </body>
 </html>
+
