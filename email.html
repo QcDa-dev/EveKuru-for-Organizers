@@ -17,7 +17,7 @@
     <main class="main-content">
       <div class="content-card">
           <h1 class="card-title">メール送信設定</h1>
-          <div class="space-y-4">
+          <div>
               <div class="form-group">
                   <label for="startRowField" class="form-label">開始行 (未入力で2行目から)</label>
                   <input type="number" id="startRowField" class="form-input">
@@ -32,7 +32,7 @@
               </div>
               <button id="sendEmailButton" class="btn btn-primary">メール送信</button>
               <button onclick="location.href='admin.html'" class="btn btn-secondary">戻る</button>
-              <p id="statusMessage" class="text-center text-sm font-medium h-5"></p>
+              <p id="statusMessage" class="text-center text-sm font-medium h-5 mt-4"></p>
           </div>
       </div>
     </main>
@@ -46,18 +46,18 @@
     import { initPage, authGuard, callGasApi } from './common.js';
 
     let session;
+    initPage({ auth: 'private', title: 'メール送信' });
+
     document.addEventListener('DOMContentLoaded', () => {
-      session = authGuard();
-      initPage({ auth: 'private', title: 'メール送信' });
+        session = authGuard();
+        document.getElementById('sendEmailButton').addEventListener('click', sendEmails);
     });
 
-    const sendEmailButton = document.getElementById('sendEmailButton');
-    const statusMessage = document.getElementById('statusMessage');
-
-    sendEmailButton.addEventListener('click', async () => {
+    async function sendEmails() {
       if (!session) return;
+      const statusMessage = document.getElementById('statusMessage');
       statusMessage.textContent = "送信中です...";
-      statusMessage.className = 'text-center text-sm font-medium h-5 text-blue-500';
+      statusMessage.className = 'text-center text-sm font-medium h-5 mt-4 text-blue-500';
       
       try {
         const result = await callGasApi({
@@ -70,15 +70,14 @@
           mainM: document.getElementById('mainMessage').value
         });
         statusMessage.textContent = result.message;
-        statusMessage.className = result.success 
-            ? 'text-center text-sm font-medium h-5 text-green-500' 
-            : 'text-center text-sm font-medium h-5 text-red-500';
+        statusMessage.classList.toggle('text-green-500', result.success);
+        statusMessage.classList.toggle('text-red-500', !result.success);
       } catch (error) {
         console.error("Email sending failed:", error);
         statusMessage.textContent = "通信エラーが発生しました。";
-        statusMessage.className = 'text-center text-sm font-medium h-5 text-red-500';
+        statusMessage.className = 'text-center text-sm font-medium h-5 mt-4 text-red-500';
       }
-    });
+    }
   </script>
 </body>
 </html>
