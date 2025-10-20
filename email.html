@@ -30,9 +30,9 @@
                   <label for="mainMessage" class="form-label">メール本文</label>
                   <textarea id="mainMessage" rows="6" class="form-input" placeholder="本文を入力"></textarea>
               </div>
+              <div id="statusMessage" class="message-box"></div>
               <button id="sendEmailButton" class="btn btn-primary">メール送信</button>
               <button onclick="location.href='admin.html'" class="btn btn-secondary">戻る</button>
-              <p id="statusMessage" class="text-center text-sm font-medium h-5 mt-4"></p>
           </div>
       </div>
     </main>
@@ -43,7 +43,7 @@
   </div>
 
   <script type="module">
-    import { initPage, authGuard, callGasApi } from './common.js';
+    import { initPage, authGuard, callGasApi, showMessage } from './common.js';
 
     let session;
     initPage({ auth: 'private', title: 'メール送信' });
@@ -55,9 +55,7 @@
 
     async function sendEmails() {
       if (!session) return;
-      const statusMessage = document.getElementById('statusMessage');
-      statusMessage.textContent = "送信中です...";
-      statusMessage.className = 'text-center text-sm font-medium h-5 mt-4 text-blue-500';
+      showMessage('statusMessage', "送信中です...", 'info');
       
       try {
         const result = await callGasApi({
@@ -69,13 +67,10 @@
           endRow: document.getElementById('endRowField').value,
           mainM: document.getElementById('mainMessage').value
         });
-        statusMessage.textContent = result.message;
-        statusMessage.classList.toggle('text-green-500', result.success);
-        statusMessage.classList.toggle('text-red-500', !result.success);
+        showMessage('statusMessage', result.message, result.success ? 'success' : 'error');
       } catch (error) {
         console.error("Email sending failed:", error);
-        statusMessage.textContent = "通信エラーが発生しました。";
-        statusMessage.className = 'text-center text-sm font-medium h-5 mt-4 text-red-500';
+        showMessage('statusMessage', "通信エラーが発生しました。", 'error');
       }
     }
   </script>
