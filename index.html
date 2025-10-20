@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EveKuru for Organizers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100">
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="hidden">
+    <div class="loader"></div>
+  </div>
+
+  <div id="app-container" class="relative min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-20">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-gray-800">EveKuru for Organizers</a>
+            <button id="menu-button" class="z-40 p-2 -mr-2">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Slide-out Menu -->
+    <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+    <nav id="menu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-40 p-6 transform translate-x-full">
+        <ul class="space-y-2">
+            <li><a href="guide.html" target="_blank" class="menu-link">使い方ガイド</a></li>
+            <li><a href="https://forms.gle/your-contact-form" target="_blank" class="menu-link">お問い合わせ</a></li>
+            <li><a href="release-notes.html" target="_blank" class="menu-link">リリースノート</a></li>
+        </ul>
+        <hr class="my-4 border-gray-200">
+        <ul class="space-y-2">
+            <li><a href="https://qcda-dev.github.io/HP/" target="_blank" class="menu-link">QcDa Projectとは</a></li>
+        </ul>
+        <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.0.0</p>
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="w-full max-w-md mx-auto p-4 flex-grow flex flex-col justify-center">
+      <!-- Login Screen -->
+      <div id="loginScreen" class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+        <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">ログイン</h1>
+        <div class="space-y-6">
+          <div>
+              <label for="passwordField" class="block text-sm font-medium text-gray-700">パスワード</label>
+              <input type="password" id="passwordField" placeholder="パスワードを入力" class="form-input mt-1">
+          </div>
+          <button id="loginButton" class="w-full btn-primary">
+            ログイン
+          </button>
+        </div>
+        <p id="loginError" class="text-center text-sm text-red-500 mt-4 h-5"></p>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4">
+        <p class="text-xs text-gray-500">© 2025 QcDa Project. All Rights Reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    // --- Configuration ---
+    // ▼▼▼ 【重要】デプロイしたGASウェブアプリのURLに置き換えてください ▼▼▼
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxoFBzgM3ik-feki_Fl-BfLqbwVoCxEC3Ak5ehYLNoa0oS-0XO684lBZpTZiW-gsbAL/exec";
+    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+    // --- DOM Elements ---
+    const menuButton = document.getElementById('menu-button');
+    const menu = document.getElementById('menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const loginButton = document.getElementById('loginButton');
+    const passwordField = document.getElementById('passwordField');
+    const loginError = document.getElementById('loginError');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // --- UI Functions ---
+    function toggleMenu() {
+      menu.classList.toggle('translate-x-full');
+      menuOverlay.classList.toggle('hidden');
+    }
+
+    function showLoader() {
+      loadingOverlay.classList.remove('hidden');
+    }
+
+    function hideLoader() {
+      loadingOverlay.classList.add('hidden');
+    }
+
+    // --- Event Listeners ---
+    menuButton.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', toggleMenu);
+
+    loginButton.addEventListener('click', login);
+    passwordField.addEventListener('keypress', function(event) {
+        if (event.key === "Enter") {
+            login();
+        }
+    });
+
+    // --- Core Logic ---
+    async function login() {
+      const password = passwordField.value;
+      loginError.textContent = '';
+
+      if (!password.trim()){
+        loginError.textContent = "パスワードを入力してください";
+        return;
+      }
+      
+      showLoader();
+
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=UTF-8',
+          },
+          body: JSON.stringify({
+            action: 'checkPassword',
+            password: password
+          })
+        });
+        
+        const result = await response.json();
+
+        if (result.success) {
+          // Store session info and redirect to admin page
+          sessionStorage.setItem('sheetId', result.sheetId);
+          sessionStorage.setItem('eventName', result.eventName);
+          sessionStorage.setItem('exportId', result.exportId);
+          window.location.href = 'admin.html';
+        } else {
+          loginError.textContent = 'パスワードが間違っています';
+        }
+      } catch (error) {
+        console.error("Login failed:", error);
+        loginError.textContent = 'ログインエラーが発生しました。';
+      } finally {
+        hideLoader();
+      }
+    }
+  </script>
+</body>
+</html>
