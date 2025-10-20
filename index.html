@@ -32,8 +32,10 @@
   </div>
 
   <script type="module">
-    import { initPage, callGasApi, showMessage } from './common.js';
+    import { initPage, callGasApi, showMessage, checkAutoLogin, saveSession } from './common.js';
 
+    // checkAutoLogin must be called before initPage's DOMContentLoaded
+    checkAutoLogin(); 
     initPage({ auth: 'public', title: 'ログイン' });
 
     const loginButton = document.getElementById('loginButton');
@@ -54,9 +56,11 @@
       try {
         const result = await callGasApi({ action: 'checkPassword', password });
         if (result.success) {
-          sessionStorage.setItem('sheetId', result.sheetId);
-          sessionStorage.setItem('eventName', result.eventName);
-          sessionStorage.setItem('exportId', result.exportId);
+          saveSession({
+              sheetId: result.sheetId,
+              eventName: result.eventName,
+              exportId: result.exportId
+          });
           window.location.href = 'admin.html';
         } else {
           showMessage('loginError', 'パスワードが間違っています', 'error');
