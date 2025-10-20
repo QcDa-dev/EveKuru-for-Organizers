@@ -32,22 +32,27 @@
   </div>
 
   <script type="module">
-    import { initPage, callGasApi, showMessage, checkAutoLogin, saveSession } from './common.js';
+    import { initPage, callGasApi, showMessage, checkAutoLogin, saveSession, hideLoader } from './common.js';
 
-    // checkAutoLogin must be called before initPage's DOMContentLoaded
-    checkAutoLogin(); 
-    initPage({ auth: 'public', title: 'ログイン' });
+    // checkAutoLogin returns true if it redirects, so we don't need to do anything else.
+    if (!checkAutoLogin()) {
+        // If not redirecting, initialize the page and hide the loader.
+        initPage({ auth: 'public-login', title: 'ログイン' });
 
-    const loginButton = document.getElementById('loginButton');
-    const passwordField = document.getElementById('passwordField');
+        document.addEventListener('DOMContentLoaded', () => {
+          hideLoader();
+          const loginButton = document.getElementById('loginButton');
+          const passwordField = document.getElementById('passwordField');
 
-    loginButton.addEventListener('click', login);
-    passwordField.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') login();
-    });
+          loginButton.addEventListener('click', login);
+          passwordField.addEventListener('keypress', (e) => {
+              if (e.key === 'Enter') login();
+          });
+        });
+    }
 
     async function login() {
-      const password = passwordField.value;
+      const password = document.getElementById('passwordField').value;
       if (!password.trim()) {
         showMessage('loginError', "パスワードを入力してください", 'error');
         return;
