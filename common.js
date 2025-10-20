@@ -5,7 +5,8 @@
 // --- Configuration ---
 export const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyDfNZbhu3xOLjApPQ1a2anibwh-Ck6ZlaO88RcrVtcJX9-EAvdiWgCPvi-xlGfBi-XzQ/exec";
 export const GITHUB_USER = 'qcda-dev';
-export const GITHUB_REPO = 'EveKuru-for-Organizers';
+export const GITHUB_REPO = 'EveKuru-for^Organizers';
+const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 /**
  * Renders the common header and menu into the placeholder.
@@ -103,18 +104,91 @@ export function initPage(config) {
 }
 
 // --- Auth & API ---
-export function authGuard() {
-    const sheetId = sessionStorage.getItem('sheetId');
-    if (!sheetId) {
-        window.location.href = 'index.html';
-        return null;
-    }
-    return {
-        sheetId,
-        eventName: sessionStorage.getItem('eventName'),
-        exportId: sessionStorage.getItem('exportId')
+
+/**
+ * Saves session data to both sessionStorage (for the current tab) and localStorage (for persistence).
+ * @param {object} sessionData - The session data to save { sheetId, eventName, exportId }.
+ */
+export function saveSession(sessionData) {
+    sessionStorage.setItem('sheetId', sessionData.sheetId);
+    sessionStorage.setItem('eventName', sessionData.eventName);
+    sessionStorage.setItem('exportId', sessionData.exportId);
+
+    const sessionWithExpiry = {
+        ...sessionData,
+        expiry: new Date().getTime() + SESSION_DURATION
     };
+    localStorage.setItem('evekuru-organizer-session', JSON.stringify(sessionWithExpiry));
 }
+
+/**
+ * Clears session data from both sessionStorage and localStorage.
+ */
+export function clearSession() {
+    sessionStorage.clear();
+    localStorage.removeItem('evekuru-organizer-session');
+}
+
+/**
+ * Checks for a valid session. First checks sessionStorage, then localStorage.
+ * If a valid localStorage session is found, it populates sessionStorage.
+ * Redirects to index.html if no valid session is found.
+ * @returns {object | null} The session data or null if invalid.
+ */
+export function authGuard() {
+    // 1. Check sessionStorage first (for current tab)
+    let sheetId = sessionStorage.getItem('sheetId');
+    if (sheetId) {
+        return {
+            sheetId,
+            eventName: sessionStorage.getItem('eventName'),
+            exportId: sessionStorage.getItem('exportId')
+        };
+    }
+    
+    // 2. If not in sessionStorage, check localStorage (for persistent login)
+    const storedSession = localStorage.getItem('evekuru-organizer-session');
+    if (storedSession) {
+        const session = JSON.parse(storedSession);
+        // Check if the session has expired
+        if (new Date().getTime() < session.expiry) {
+            // Session is valid, populate sessionStorage and return data
+            sessionStorage.setItem('sheetId', session.sheetId);
+            sessionStorage.setItem('eventName', session.eventName);
+            sessionStorage.setItem('exportId', session.exportId);
+            return session;
+        } else {
+            // Session expired, clear it
+            clearSession();
+        }
+    }
+
+    // 3. No valid session found, redirect to login page
+    window.location.href = 'index.html';
+    return null;
+}
+
+/**
+ * Checks for an auto-login session on the login page.
+ * If a valid session is found in localStorage, redirects to admin.html.
+ */
+export function checkAutoLogin() {
+    const storedSession = localStorage.getItem('evekuru-organizer-session');
+    if (storedSession) {
+        const session = JSON.parse(storedSession);
+        if (new Date().getTime() < session.expiry) {
+            // Valid session found, populate sessionStorage and redirect
+            sessionStorage.setItem('sheetId', session.sheetId);
+            sessionStorage.setItem('eventName', session.eventName);
+            sessionStorage.setItem('exportId', session.exportId);
+            window.location.href = 'admin.html';
+        } else {
+            // Expired session
+            localStorage.removeItem('evekuru-organizer-session');
+        }
+    }
+}
+
 
 export async function callGasApi(payload) {
     showLoader();
