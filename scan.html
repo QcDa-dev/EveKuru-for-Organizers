@@ -7,18 +7,19 @@
   <link rel="stylesheet" href="common.css">
 </head>
 <body>
+  <div id="loadingOverlay" class="loader-overlay hidden">
+      <div class="loader"></div>
+  </div>
   <div class="page-container">
     <div id="header-placeholder"></div>
 
     <main class="main-content">
       <div class="content-card">
           <h1 class="card-title">会員証読み取り</h1>
-          <div>
-              <div id="reader" class="mb-4"></div>
-              <p id="result" class="text-center font-mono text-sm h-5 mb-4"></p>
-              <button id="soundButton" class="btn btn-secondary">サウンドON (iOS/iPadOS)</button>
-              <button onclick="location.href='admin.html'" class="btn btn-secondary">戻る</button>
-          </div>
+          <div id="reader"></div>
+          <div id="result" class="message-box"></div>
+          <button id="soundButton" class="btn btn-secondary">サウンドON (iOS/iPadOS)</button>
+          <button onclick="location.href='admin.html'" class="btn btn-secondary">戻る</button>
       </div>
     </main>
 
@@ -29,7 +30,7 @@
   
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script type="module">
-    import { initPage, authGuard, callGasApi } from './common.js';
+    import { initPage, authGuard, callGasApi, showMessage } from './common.js';
     
     let session;
     initPage({ auth: 'private', title: '会員証読み取り' });
@@ -45,24 +46,22 @@
     const audio = new Audio(BEEP_SOUND_URL);
 
     function initializeScanner() {
-      const resultDiv = document.getElementById('result');
+      let lastScannedText = '';
 
       const onScanSuccess = async (decodedText) => {
         if (lastScannedText === decodedText) return;
         lastScannedText = decodedText;
         
-        resultDiv.textContent = `スキャン成功: ${decodedText}`;
-        resultDiv.className = 'text-center font-mono text-sm h-5 mb-4 text-green-600';
-        audio.play();
+        audio.play().catch(console.error);
+        showMessage('result', `スキャン成功: ${decodedText}`, 'success');
         
         try {
           await callGasApi({ action: 'onScan', sheetId: session.sheetId, text: decodedText, eventName: session.eventName });
         } catch (error) {
           console.error("Failed to save scan:", error);
-          resultDiv.textContent = `"${decodedText}"の保存に失敗しました。`;
-          resultDiv.className = 'text-center font-mono text-sm h-5 mb-4 text-red-500';
+          showMessage('result', `"${decodedText}"の保存に失敗しました。`, 'error');
         }
-        setTimeout(() => { lastScannedText = ''; }, 3000);
+        setTimeout(() => { lastScannedText = ''; }, 3000); // Prevent re-scans for 3 seconds
       };
 
       const html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
