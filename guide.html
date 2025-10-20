@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使い方ガイド - EveKuru for Organizers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .step-card {
+            @apply bg-white p-6 rounded-xl shadow-md border border-gray-200;
+        }
+        .step-number {
+            @apply flex-shrink-0 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+  <div id="app-container" class="relative min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-20">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-gray-800">EveKuru for Organizers</a>
+            <button id="menu-button" class="z-40 p-2 -mr-2">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Slide-out Menu -->
+    <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+    <nav id="menu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-40 p-6 transform translate-x-full">
+        <ul class="space-y-2">
+            <li><a href="guide.html" target="_blank" class="menu-link">使い方ガイド</a></li>
+            <li><a href="https://forms.gle/your-contact-form" target="_blank" class="menu-link">お問い合わせ</a></li>
+            <li><a href="release-notes.html" target="_blank" class="menu-link">リリースノート</a></li>
+        </ul>
+        <hr class="my-4 border-gray-200">
+        <ul class="space-y-2">
+            <li><a href="https://qcda-dev.github.io/HP/" target="_blank" class="menu-link">QcDa Projectとは</a></li>
+        </ul>
+        <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.0.0</p>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <section>
+            <h1 class="text-3xl font-bold text-center mb-10">使い方ガイド</h1>
+            <div class="max-w-2xl mx-auto space-y-8">
+                <!-- Step 1 -->
+                <div class="step-card flex items-start space-x-4">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">ログイン</h3>
+                        <p class="text-gray-600">
+                            アプリのURLにアクセスすると、ログイン画面が表示されます。<br>
+                            運営から共有されたパスワードを入力し、「ログイン」ボタンをタップしてください。
+                        </p>
+                    </div>
+                </div>
+                <!-- Step 2 -->
+                <div class="step-card flex items-start space-x-4">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">管理画面</h3>
+                        <p class="text-gray-600">
+                            ログインに成功すると、管理者画面が表示されます。<br>
+                            ここから「メール送信」と「会員証読み取り」の各機能へ進むことができます。
+                        </p>
+                    </div>
+                </div>
+                <!-- Step 3 -->
+                <div class="step-card flex items-start space-x-4">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">メール送信</h3>
+                        <p class="text-gray-600">
+                           参加者リスト（スプレッドシート）の行番号を指定して、特定の範囲の参加者にメールを一括送信できます。<br>
+                           本文を入力し、「メール送信」ボタンを押すと、領収書PDFが添付されたメールが送信されます。
+                        </p>
+                    </div>
+                </div>
+                <!-- Step 4 -->
+                <div class="step-card flex items-start space-x-4">
+                    <div class="step-number">4</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">会員証の読み取り</h3>
+                        <p class="text-gray-600">
+                            このページを開くとカメラが起動します。参加者が提示するQRコードをカメラの枠内に収めると、自動で読み取りが行われます。<br>
+                            読み取りが成功すると音が鳴り、スプレッドシートに来場履歴が記録されます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4">
+        <p class="text-xs text-gray-500">© 2025 QcDa Project. All Rights Reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    const menuButton = document.getElementById('menu-button');
+    const menu = document.getElementById('menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+
+    function toggleMenu() {
+      menu.classList.toggle('translate-x-full');
+      menuOverlay.classList.toggle('hidden');
+    }
+
+    menuButton.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', toggleMenu);
+  </script>
+</body>
+</html>
