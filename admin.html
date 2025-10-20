@@ -32,7 +32,7 @@
   </div>
 
   <script type="module">
-    import { initPage, authGuard } from './common.js';
+    import { initPage, authGuard, clearSession } from './common.js';
 
     initPage({ auth: 'private', title: '管理画面' });
     
@@ -42,7 +42,7 @@
           document.getElementById('eventNameDisplay').textContent = session.eventName || 'イベント名未設定';
         }
         document.getElementById('logoutButton').addEventListener('click', () => {
-          sessionStorage.clear();
+          clearSession();
           window.location.href = 'index.html';
         });
     });
