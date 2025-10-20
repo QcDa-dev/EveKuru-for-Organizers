@@ -23,6 +23,7 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
+    margin: 0;
 }
 
 /* --- Layout --- */
@@ -135,9 +136,10 @@ body {
     border: none;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
+    margin-top: 0.5rem; /* Add margin between buttons */
 }
-.btn:hover {
-    transform: translateY(-1px);
+.btn:first-of-type {
+    margin-top: 0;
 }
 
 .btn-primary {
@@ -175,7 +177,7 @@ body {
     background-color: white;
     box-shadow: -5px 0 15px rgba(0,0,0,0.1);
     z-index: 40;
-    padding: 1.5rem;
+    padding: 1rem;
     transform: translateX(0);
     transition: transform 0.3s ease-in-out;
 }
@@ -185,6 +187,14 @@ body {
 #menu-overlay.is-hidden {
     opacity: 0;
     pointer-events: none;
+}
+.menu-list {
+    list-style-type: none; /* Remove bullets */
+    padding: 0;
+    margin: 0;
+}
+.menu-list-item {
+    margin-bottom: 0.5rem;
 }
 .menu-link {
     display: block;
@@ -231,3 +241,40 @@ body {
     border-radius: 8px;
     overflow: hidden;
 }
+
+/* Guide & Release notes */
+.step-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+.step-number {
+    flex-shrink: 0;
+    background-color: var(--secondary-color);
+    color: white;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+.release-content h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 2px solid var(--border-color);
+}
+.release-content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+}
+
