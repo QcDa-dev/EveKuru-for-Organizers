@@ -1,0 +1,233 @@
+/**
+ * EveKuru for Organizers - Common Stylesheet
+ */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+/* CSS Variables for Theme */
+:root {
+    --primary-color: #34495e; /* 濃い青（紺） */
+    --secondary-color: #3498db; /* 明るい青 */
+    --background-color: #f4f7f9; /* 背景の薄いグレー */
+    --card-background: #ffffff;
+    --text-color: #2c3e50;
+    --text-light-color: #7f8c8d;
+    --border-color: #e0e6ed;
+    --danger-color: #e74c3c;
+    --success-color: #2ecc71;
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* --- Layout --- */
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex-grow: 1;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* --- Header --- */
+.app-header {
+    background-color: var(--card-background);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+.app-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.app-header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+.menu-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+/* --- Footer --- */
+.app-footer {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    color: var(--text-light-color);
+    font-size: 0.875rem;
+    background-color: #e8ecf0;
+}
+
+/* --- Card --- */
+.content-card {
+    background-color: var(--card-background);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+@media (min-width: 640px) {
+    .content-card {
+        padding: 2rem;
+    }
+}
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+/* --- Forms & Buttons --- */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.btn {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-secondary {
+    background-color: #ecf0f1;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+.btn-secondary:hover {
+    background-color: #dde1e2;
+}
+
+/* --- Menu --- */
+#menu-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 30;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+#menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 260px;
+    background-color: white;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    z-index: 40;
+    padding: 1.5rem;
+    transform: translateX(0);
+    transition: transform 0.3s ease-in-out;
+}
+#menu.is-closed {
+    transform: translateX(100%);
+}
+#menu-overlay.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.menu-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+.menu-link:hover {
+    background-color: var(--background-color);
+}
+
+/* --- Loader --- */
+.hidden {
+    display: none !important;
+}
+.loader-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--secondary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* QR Scanner */
+#reader {
+    width: 100%;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
