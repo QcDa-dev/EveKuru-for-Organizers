@@ -17,14 +17,12 @@
     <main class="main-content">
       <div class="content-card">
         <h1 class="card-title">ログイン</h1>
-        <div class="space-y-6">
-          <div class="form-group">
-              <label for="passwordField" class="form-label">パスワード</label>
-              <input type="password" id="passwordField" placeholder="パスワードを入力" class="form-input">
-          </div>
-          <button id="loginButton" class="btn btn-primary">ログイン</button>
+        <div class="form-group">
+            <label for="passwordField" class="form-label">パスワード</label>
+            <input type="password" id="passwordField" placeholder="パスワードを入力" class="form-input">
         </div>
-        <p id="loginError" class="text-center text-sm text-red-500 mt-4 h-5"></p>
+        <div id="loginError" class="message-box"></div>
+        <button id="loginButton" class="btn btn-primary">ログイン</button>
       </div>
     </main>
 
@@ -34,13 +32,12 @@
   </div>
 
   <script type="module">
-    import { initPage, callGasApi } from './common.js';
+    import { initPage, callGasApi, showMessage } from './common.js';
 
     initPage({ auth: 'public', title: 'ログイン' });
 
     const loginButton = document.getElementById('loginButton');
     const passwordField = document.getElementById('passwordField');
-    const loginError = document.getElementById('loginError');
 
     loginButton.addEventListener('click', login);
     passwordField.addEventListener('keypress', (e) => {
@@ -50,7 +47,7 @@
     async function login() {
       const password = passwordField.value;
       if (!password.trim()) {
-        loginError.textContent = "パスワードを入力してください";
+        showMessage('loginError', "パスワードを入力してください", 'error');
         return;
       }
       
@@ -62,11 +59,11 @@
           sessionStorage.setItem('exportId', result.exportId);
           window.location.href = 'admin.html';
         } else {
-          loginError.textContent = 'パスワードが間違っています';
+          showMessage('loginError', 'パスワードが間違っています', 'error');
         }
       } catch (error) {
         console.error("Login failed:", error);
-        loginError.textContent = 'ログインエラーが発生しました。';
+        showMessage('loginError', 'ログインエラーが発生しました。', 'error');
       }
     }
   </script>
