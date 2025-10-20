@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>管理画面 - EveKuru for Organizers</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="common.css">
 </head>
@@ -15,10 +14,10 @@
         <div class="content-card">
             <h1 class="card-title">管理画面</h1>
             <p id="eventNameDisplay" class="text-center text-gray-600 font-semibold -mt-4 mb-6 h-6"></p>
-            <div class="space-y-4">
+            <div>
                 <button onclick="location.href='email.html'" class="btn btn-primary">メール送信</button>
                 <button onclick="location.href='scan.html'" class="btn btn-primary">会員証読み取り</button>
-                <button id="logoutButton" class="btn btn-secondary mt-4">ログアウト</button>
+                <button id="logoutButton" class="btn btn-secondary">ログアウト</button>
             </div>
         </div>
     </main>
@@ -31,17 +30,18 @@
   <script type="module">
     import { initPage, authGuard } from './common.js';
 
+    let session;
+    initPage({ auth: 'private', title: '管理画面' });
+    
     document.addEventListener('DOMContentLoaded', () => {
-      const session = authGuard();
-      initPage({ auth: 'private', title: '管理画面' });
-      if(session){
-        document.getElementById('eventNameDisplay').textContent = session.eventName || 'イベント名未設定';
-      }
-    });
-
-    document.getElementById('logoutButton').addEventListener('click', () => {
-      sessionStorage.clear();
-      window.location.href = 'index.html';
+        session = authGuard();
+        if(session){
+          document.getElementById('eventNameDisplay').textContent = session.eventName || 'イベント名未設定';
+        }
+        document.getElementById('logoutButton').addEventListener('click', () => {
+          sessionStorage.clear();
+          window.location.href = 'index.html';
+        });
     });
   </script>
 </body>
