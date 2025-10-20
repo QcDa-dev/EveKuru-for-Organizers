@@ -15,7 +15,7 @@
   <div class="page-container">
     <div id="header-placeholder"></div>
 
-    <main class="main-content" style="max-width: 800px;">
+    <main class="main-content is-wide">
         <h1 class="card-title" style="margin-bottom: 2rem;">リリースノート</h1>
         <div id="release-notes-container" class="space-y-8">
             <!-- Release notes will be loaded here -->
@@ -54,10 +54,10 @@
                     const releaseDate = new Date(release.published_at).toLocaleDateString('ja-JP');
                     const releaseElement = document.createElement('div');
                     releaseElement.className = 'content-card';
-                    const releaseBodyHtml = marked.parse(release.body);
+                    const releaseBodyHtml = marked.parse(release.body || '');
                     releaseElement.innerHTML = `
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-2xl font-bold text-gray-900">${release.name || release.tag_name}</h3>
+                        <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
+                            <h2 class="text-2xl font-bold text-gray-900">${release.name || release.tag_name}</h2>
                             <span class="text-sm text-gray-500">${releaseDate}</span>
                         </div>
                         <div class="release-content text-gray-700">${releaseBodyHtml}</div>
