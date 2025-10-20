@@ -5,7 +5,7 @@
 // --- Configuration ---
 export const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyDfNZbhu3xOLjApPQ1a2anibwh-Ck6ZlaO88RcrVtcJX9-EAvdiWgCPvi-xlGfBi-XzQ/exec";
 export const GITHUB_USER = 'qcda-dev';
-export const GITHUB_REPO = 'EveKuru-for^Organizers';
+export const GITHUB_REPO = 'EveKuru-for-Organizers';
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 /**
@@ -36,7 +36,7 @@ function renderHeaderAndMenu(appName) {
           <ul class="menu-list">
               <li class="menu-list-item"><a href="https://qcda-dev.github.io/HP/" target="_blank" class="menu-link">QcDa Projectとは</a></li>
           </ul>
-          <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.4.0</p>
+          <p class="menu-version">ver 2.5.0</p>
       </nav>
     `;
 }
@@ -81,7 +81,7 @@ export function showMessage(elementId, message, type) {
     if (!el) return;
     el.textContent = message;
     el.className = 'message-box'; // Reset classes
-    el.classList.add(`is-${type}`);
+    el.classList.add(`is-${type}`, 'is-visible');
 }
 
 
@@ -99,7 +99,11 @@ export function initPage(config) {
         if (config.auth === 'private') {
             authGuard();
         }
-        hideLoader();
+        // Hide loader only after the main setup is done.
+        // For login page, specific logic will handle this.
+        if (config.auth !== 'public-login') {
+            hideLoader();
+        }
     });
 }
 
@@ -153,9 +157,7 @@ export function authGuard() {
         // Check if the session has expired
         if (new Date().getTime() < session.expiry) {
             // Session is valid, populate sessionStorage and return data
-            sessionStorage.setItem('sheetId', session.sheetId);
-            sessionStorage.setItem('eventName', session.eventName);
-            sessionStorage.setItem('exportId', session.exportId);
+            saveSession(session); // Re-save to update sessionStorage
             return session;
         } else {
             // Session expired, clear it
@@ -178,15 +180,15 @@ export function checkAutoLogin() {
         const session = JSON.parse(storedSession);
         if (new Date().getTime() < session.expiry) {
             // Valid session found, populate sessionStorage and redirect
-            sessionStorage.setItem('sheetId', session.sheetId);
-            sessionStorage.setItem('eventName', session.eventName);
-            sessionStorage.setItem('exportId', session.exportId);
+            saveSession(session);
             window.location.href = 'admin.html';
+            return true; // Indicates redirection is happening
         } else {
             // Expired session
             localStorage.removeItem('evekuru-organizer-session');
         }
     }
+    return false; // No redirection
 }
 
 
