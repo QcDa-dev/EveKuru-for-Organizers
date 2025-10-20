@@ -10,23 +10,20 @@
 </head>
 <body class="bg-gray-100">
 
-  <!-- Loading Overlay -->
   <div id="loadingOverlay" class="hidden">
     <div class="loader"></div>
   </div>
 
-  <div id="app-container" class="relative min-h-screen">
-    <!-- Header -->
+  <div id="app-container" class="relative min-h-screen flex flex-col">
     <header class="bg-white shadow-md sticky top-0 z-20">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <a href="index.html" class="text-xl font-bold text-gray-800">EveKuru for Organizers</a>
-            <button id="menu-button" class="z-40 p-2 -mr-2">
+            <button id="menu-button" class="z-40 p-2 -mr-2 text-gray-600">
                 <i class="fas fa-bars fa-lg"></i>
             </button>
         </div>
     </header>
 
-    <!-- Slide-out Menu -->
     <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
     <nav id="menu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-40 p-6 transform translate-x-full">
         <ul class="space-y-2">
@@ -38,12 +35,10 @@
         <ul class="space-y-2">
             <li><a href="https://qcda-dev.github.io/HP/" target="_blank" class="menu-link">QcDa Projectとは</a></li>
         </ul>
-        <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.0.0</p>
+        <p class="absolute bottom-4 right-4 text-xs text-gray-400">ver 2.1.0</p>
     </nav>
 
-    <!-- Main Content -->
     <main class="w-full max-w-md mx-auto p-4 flex-grow flex flex-col justify-center">
-      <!-- Email Send Screen -->
       <div id="emailScreen" class="bg-white rounded-xl shadow-lg p-6 sm:p-8 space-y-4">
           <h1 class="text-2xl font-bold text-gray-800 text-center">メール送信設定</h1>
           <div>
@@ -64,91 +59,57 @@
       </div>
     </main>
 
-    <!-- Footer -->
     <footer class="text-center py-4">
         <p class="text-xs text-gray-500">© 2025 QcDa Project. All Rights Reserved.</p>
     </footer>
   </div>
 
-  <script>
-    // --- Configuration ---
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyDfNZbhu3xOLjApPQ1a2anibwh-Ck6ZlaO88RcrVtcJX9-EAvdiWgCPvi-xlGfBi-XzQ/exec";
+  <script type="module">
+    import { initMenu, authGuard, callGasApi } from './common.js';
 
-    // --- DOM Elements ---
-    const menuButton = document.getElementById('menu-button');
-    const menu = document.getElementById('menu');
-    const menuOverlay = document.getElementById('menu-overlay');
     const sendEmailButton = document.getElementById('sendEmailButton');
     const statusMessage = document.getElementById('statusMessage');
-    const loadingOverlay = document.getElementById('loadingOverlay');
+    let session;
 
-    // --- Global Variables ---
-    let sheetId, eventName, exportId;
-
-    // --- UI Functions ---
-    function toggleMenu() {
-      menu.classList.toggle('translate-x-full');
-      menuOverlay.classList.toggle('hidden');
-    }
-    function showLoader() { loadingOverlay.classList.remove('hidden'); }
-    function hideLoader() { loadingOverlay.classList.add('hidden'); }
-
-    // --- Auth Guard ---
+    // --- Page Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
-      sheetId = sessionStorage.getItem('sheetId');
-      eventName = sessionStorage.getItem('eventName');
-      exportId = sessionStorage.getItem('exportId');
-
-      if (!sheetId) {
-        window.location.href = 'index.html';
-      }
+      initMenu();
+      session = authGuard(); // Protect page and get session data
     });
 
-    // --- Event Listeners ---
-    menuButton.addEventListener('click', toggleMenu);
-    menuOverlay.addEventListener('click', toggleMenu);
+    // --- Event Listener ---
     sendEmailButton.addEventListener('click', sendEmails);
 
     // --- Core Logic ---
     async function sendEmails() {
+      if (!session) return; // Exit if not logged in
+
       statusMessage.textContent = "送信中です...";
       statusMessage.className = 'text-center text-sm font-medium h-5 text-blue-500';
-      showLoader();
-
-      const startRow = document.getElementById('startRowField').value;
-      const endRow = document.getElementById('endRowField').value;
-      const mainM = document.getElementById('mainMessage').value;
+      
+      const payload = {
+        action: 'sendEmails',
+        sheetId: session.sheetId,
+        eventName: session.eventName,
+        exportId: session.exportId,
+        startRow: document.getElementById('startRowField').value,
+        endRow: document.getElementById('endRowField').value,
+        mainM: document.getElementById('mainMessage').value
+      };
 
       try {
-        const response = await fetch(GAS_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-          body: JSON.stringify({
-            action: 'sendEmails',
-            sheetId: sheetId,
-            startRow: startRow,
-            endRow: endRow,
-            eventName: eventName,
-            mainM: mainM,
-            exportId: exportId
-          })
-        });
-
-        const result = await response.json();
+        const result = await callGasApi(payload);
         statusMessage.textContent = result.message;
-        if (result.success) {
-          statusMessage.className = 'text-center text-sm font-medium h-5 text-green-500';
-        } else {
-          statusMessage.className = 'text-center text-sm font-medium h-5 text-red-500';
-        }
+        statusMessage.className = result.success 
+            ? 'text-center text-sm font-medium h-5 text-green-500' 
+            : 'text-center text-sm font-medium h-5 text-red-500';
       } catch (error) {
         console.error("Email sending failed:", error);
         statusMessage.textContent = "エラーが発生しました。";
         statusMessage.className = 'text-center text-sm font-medium h-5 text-red-500';
-      } finally {
-        hideLoader();
       }
     }
   </script>
 </body>
 </html>
+
